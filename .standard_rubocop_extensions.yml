@@ -1,3 +1,15 @@
 require:
   - rubocop-rails
   - rubocop-rspec
+
+RSpec/ExpectInHook:
+  Enabled: false
+
+RSpec/LetSetup:
+  Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Enabled: false
