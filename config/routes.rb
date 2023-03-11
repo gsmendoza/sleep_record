@@ -1,7 +1,3 @@
 Rails.application.routes.draw do
-  resources :sleep_records
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Defines the root path route ("/")
-  # root "articles#index"
+  resources :sleep_records, only: [:create, :show]
 end

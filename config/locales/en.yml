@@ -31,3 +31,12 @@
 
 en:
   hello: "Hello world"
+
+en:
+  activerecord:
+    errors:
+      models:
+        sleep_record:
+          attributes:
+            base:
+              has_ongoing_sleep_record: has ongoing sleep record

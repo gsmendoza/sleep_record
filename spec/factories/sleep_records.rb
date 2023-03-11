@@ -1,6 +1,21 @@
 FactoryBot.define do
   factory :sleep_record do
-    user { nil }
-    clocked_in_at { "2023-03-11 15:59:56" }
+    user
+
+    clocked_in_at { Time.utc(2023, 1, 1, 22) }
+
+    clocked_out_at do
+      clocked_in_at ? clocked_in_at + 8.hours : Time.utc(2023, 1, 2, 6)
+    end
+
+    trait :ongoing do
+      clocked_in_at { Time.current - 8.hours }
+      clocked_out_at { nil }
+    end
+
+    trait :completed do
+      clocked_in_at { Time.utc(2023, 1, 1, 22) }
+      clocked_out_at { Time.utc(2023, 1, 2, 6) }
+    end
   end
 end
