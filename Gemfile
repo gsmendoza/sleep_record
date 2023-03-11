@@ -49,3 +49,5 @@ group :development do
   # gem "spring"
   gem "lefthook", "~> 1.3", require: false
 end
+
+gem "validates_timeliness", "~> 7.0.0.beta1"

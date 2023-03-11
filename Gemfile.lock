@@ -200,10 +200,14 @@ GEM
     standardrb (1.0.1)
       standard
     thor (1.2.1)
+    timeliness (0.4.5)
     timeout (0.3.2)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.4.2)
+    validates_timeliness (7.0.0.beta1)
+      activemodel (>= 7.0.0, < 8)
+      timeliness (>= 0.3.10, < 1)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -223,6 +227,7 @@ DEPENDENCIES
   sqlite3 (~> 1.4)
   standardrb (~> 1.0)
   tzinfo-data
+  validates_timeliness (~> 7.0.0.beta1)
 
 RUBY VERSION
    ruby 3.1.2p20
