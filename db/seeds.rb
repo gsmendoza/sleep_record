@@ -1,7 +1,18 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Examples:
-#
-#   movies = Movie.create([{ name: "Star Wars" }, { name: "Lord of the Rings" }])
-#   Character.create(name: "Luke", movie: movies.first)
+if Rails.env.development?
+  %i[George Lenny Leela Coleen].each do |name|
+    User.create!(name: name)
+  end
+
+  user = User.first!
+
+  starting_time = Time.utc(2023, 1, 1)
+
+  0.upto(9) do |i|
+    clocked_in_at = starting_time + i.days - 2.hours
+
+    user.sleep_records.create!(
+      clocked_in_at: clocked_in_at,
+      clocked_out_at: clocked_in_at + 8.hours
+    )
+  end
+end
