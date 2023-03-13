@@ -14,6 +14,17 @@ class SleepRecord < ApplicationRecord
     new(attributes.merge(clocked_in_at: Time.current))
   end
 
+  def clock_out
+    if clocked_out_at.present?
+      errors.add :base, :has_already_been_clocked_out
+
+      false
+    else
+      self.clocked_out_at = Time.current
+      save
+    end
+  end
+
   private
 
   def ensure_user_has_no_ongoing_sleep_record

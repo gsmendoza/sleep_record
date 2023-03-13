@@ -88,4 +88,39 @@ RSpec.describe SleepRecord, type: :model do
       expect(sleep_record.user).to eq(user)
     end
   end
+
+  describe "#clock_out" do
+    context "when the sleep record is ongoing" do
+      let!(:sleep_record) { create(:sleep_record, :ongoing) }
+
+      before do
+        expect(sleep_record.clocked_out_at).to be_nil
+      end
+
+      it "sets the clock out to the current time", :aggregate_failures do
+        expect(sleep_record.clock_out).to be_truthy
+
+        sleep_record.reload
+        expect(sleep_record.clocked_out_at).to be_present
+      end
+    end
+
+    context "when the sleep record is completed" do
+      let(:clocked_in_at) { Time.utc(2023, 1, 1, 22) }
+      let(:clocked_out_at) { clocked_in_at + 8.hours }
+
+      let!(:sleep_record) do
+        create(:sleep_record,
+          clocked_in_at: clocked_in_at,
+          clocked_out_at: clocked_out_at)
+      end
+
+      it "returns false", aggregate_failures: true do
+        expect(sleep_record.clock_out).to be_falsey
+
+        expect(sleep_record.errors[:base]).to include("has already been clocked out")
+        expect(sleep_record.clocked_out_at).to eq(clocked_out_at)
+      end
+    end
+  end
 end

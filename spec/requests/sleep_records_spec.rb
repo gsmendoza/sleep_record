@@ -70,4 +70,40 @@ RSpec.describe "/sleep_records", type: :request do
       end
     end
   end
+
+  describe "PATCH /clock_out" do
+    context "with an ongoing sleep record" do
+      let!(:sleep_record) { create(:sleep_record, :ongoing) }
+
+      before do
+        expect(sleep_record.clocked_out_at).to be_nil
+      end
+
+      it "clocks out the requested sleep_record" do
+        patch clock_out_sleep_record_url(sleep_record), headers: valid_headers, as: :json
+
+        sleep_record.reload
+
+        expect(sleep_record.clocked_out_at).to be_present
+      end
+
+      it "renders a JSON response with the sleep_record", aggregate_failures: true do
+        patch clock_out_sleep_record_url(sleep_record), headers: valid_headers, as: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to match(a_string_including("application/json"))
+      end
+    end
+
+    context "with a completed sleep record" do
+      let!(:sleep_record) { create(:sleep_record, :completed) }
+
+      it "renders a JSON response with errors for the sleep_record", aggregate_failures: true do
+        patch clock_out_sleep_record_url(sleep_record), headers: valid_headers, as: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.content_type).to match(a_string_including("application/json"))
+      end
+    end
+  end
 end

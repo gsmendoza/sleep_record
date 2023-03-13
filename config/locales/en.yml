@@ -40,3 +40,4 @@ en:
           attributes:
             base:
               has_ongoing_sleep_record: belongs to a user who has an ongoing sleep record
+              has_already_been_clocked_out: has already been clocked out
