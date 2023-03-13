@@ -1,6 +1,12 @@
 class SleepRecordsController < ApplicationController
   before_action :set_sleep_record, only: %i[show clock_out]
 
+  def index
+    @sleep_records = SleepRecord.order(:created_at).page(params[:page]).per(params[:per])
+
+    render json: @sleep_records
+  end
+
   def show
     render json: @sleep_record
   end

@@ -25,6 +25,27 @@ RSpec.describe "/sleep_records", type: :request do
     expect(User.where(id: non_existent_user_id)).to be_empty
   end
 
+  describe "GET /index" do
+    let!(:sleep_records) do
+      create_list(:sleep_record, 3, :completed)
+    end
+
+    it "renders a successful response" do
+      get sleep_records_url, headers: valid_headers, as: :json
+      expect(response).to be_successful
+    end
+
+    context "when pagination params are specified" do
+      let(:per) { 2 }
+
+      it "paginates the results" do
+        get sleep_records_url(page: 1, per: per), headers: valid_headers, as: :json
+
+        expect(ActiveSupport::JSON.decode(response.body).size).to eq(per)
+      end
+    end
+  end
+
   describe "GET /show" do
     let!(:sleep_record) { create(:sleep_record) }
 
