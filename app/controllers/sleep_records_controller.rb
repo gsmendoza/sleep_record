@@ -6,7 +6,7 @@ class SleepRecordsController < ApplicationController
   end
 
   def create
-    @sleep_record = SleepRecord.new(sleep_record_params.merge(clocked_in_at: Time.current))
+    @sleep_record = SleepRecord.new_clock_in(sleep_record_params)
 
     if @sleep_record.save
       render json: @sleep_record, status: :created, location: @sleep_record

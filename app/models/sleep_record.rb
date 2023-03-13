@@ -10,6 +10,10 @@ class SleepRecord < ApplicationRecord
 
   validate :ensure_user_has_no_ongoing_sleep_record, on: :create
 
+  def self.new_clock_in(attributes = {})
+    new(attributes.merge(clocked_in_at: Time.current))
+  end
+
   private
 
   def ensure_user_has_no_ongoing_sleep_record

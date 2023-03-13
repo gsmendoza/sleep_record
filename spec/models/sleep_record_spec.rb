@@ -72,4 +72,20 @@ RSpec.describe SleepRecord, type: :model do
       end
     end
   end
+
+  describe ".new_clock_in" do
+    let(:user) { create(:user) }
+
+    it "builds a new sleep record with the clocked_in_at set to the current time" do
+      sleep_record = described_class.new_clock_in
+
+      expect(sleep_record.clocked_in_at).to be_present
+    end
+
+    it "sets the sleep record's attributes to the arguments" do
+      sleep_record = described_class.new_clock_in(user: user)
+
+      expect(sleep_record.user).to eq(user)
+    end
+  end
 end
