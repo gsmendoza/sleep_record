@@ -31,5 +31,16 @@ RSpec.describe FollowRelationship, type: :model do
         end
       end
     end
+
+    describe "concerning self-following" do
+      context "when the follower follows himself" do
+        let(:followee) { follower }
+
+        it "is expected to be falsey", :aggregate_failures do
+          expect(is_valid).to be_falsey
+          expect(follow_relationship.errors[:follower_id]).to include("is following himself")
+        end
+      end
+    end
   end
 end

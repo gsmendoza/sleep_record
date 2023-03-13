@@ -36,6 +36,10 @@ en:
   activerecord:
     errors:
       models:
+        follow_relationship:
+          attributes:
+            follower_id:
+              follows_himself: is following himself
         sleep_record:
           attributes:
             base:
