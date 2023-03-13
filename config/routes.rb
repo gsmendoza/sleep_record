@@ -4,4 +4,6 @@ Rails.application.routes.draw do
       patch :clock_out
     end
   end
+
+  resources :follow_relationships, only: [:create, :show]
 end
