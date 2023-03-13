@@ -53,3 +53,5 @@ group :development do
 end
 
 gem "validates_timeliness", "~> 7.0.0.beta1"
+
+gem "kaminari-activerecord", "~> 1.2"
