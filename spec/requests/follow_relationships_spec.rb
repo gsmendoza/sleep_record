@@ -1,8 +1,28 @@
 require "rails_helper"
 
-RSpec.describe "/sleep_records", type: :request do
+RSpec.describe "/follow_relationships", type: :request do
+  let(:valid_attributes) do
+    {
+      user_id: user.id
+    }
+  end
+
+  let(:non_existent_user_id) { 0 }
+
+  let(:invalid_attributes) do
+    {
+      user_id: non_existent_user_id
+    }
+  end
+
   let(:valid_headers) do
     {}
+  end
+
+  let!(:user) { create(:user) }
+
+  before do
+    expect(User.where(id: non_existent_user_id)).to be_empty
   end
 
   describe "GET /index" do
@@ -38,14 +58,6 @@ RSpec.describe "/sleep_records", type: :request do
 
   describe "POST /create" do
     context "with valid parameters" do
-      let!(:user) { create(:user) }
-
-      let(:valid_attributes) do
-        {
-          user_id: user.id
-        }
-      end
-
       it "creates a new SleepRecord" do
         expect {
           post sleep_records_url,
@@ -63,18 +75,6 @@ RSpec.describe "/sleep_records", type: :request do
     end
 
     context "with invalid parameters" do
-      let(:invalid_attributes) do
-        {
-          user_id: non_existent_user_id
-        }
-      end
-
-      let(:non_existent_user_id) { 0 }
-
-      before do
-        expect(User.where(id: non_existent_user_id)).to be_empty
-      end
-
       it "does not create a new SleepRecord" do
         expect {
           post sleep_records_url,
