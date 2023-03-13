@@ -39,4 +39,4 @@ en:
         sleep_record:
           attributes:
             base:
-              has_ongoing_sleep_record: has ongoing sleep record
+              has_ongoing_sleep_record: belongs to a user who has an ongoing sleep record
