@@ -75,4 +75,14 @@ RSpec.describe "/follow_relationships", type: :request do
       end
     end
   end
+
+  describe "DELETE /destroy" do
+    let!(:follow_relationship) { create(:follow_relationship) }
+
+    it "destroys the requested follow relationship" do
+      expect {
+        delete follow_relationship_url(follow_relationship), headers: valid_headers, as: :json
+      }.to change(FollowRelationship, :count).by(-1)
+    end
+  end
 end

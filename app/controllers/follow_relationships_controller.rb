@@ -1,5 +1,5 @@
 class FollowRelationshipsController < ApplicationController
-  before_action :set_follow_relationship, only: %i[show]
+  before_action :set_follow_relationship, only: %i[show destroy]
 
   def show
     render json: @follow_relationship
@@ -13,6 +13,10 @@ class FollowRelationshipsController < ApplicationController
     else
       render json: @follow_relationship.errors, status: :unprocessable_entity
     end
+  end
+
+  def destroy
+    @follow_relationship.destroy
   end
 
   private

@@ -5,5 +5,5 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :follow_relationships, only: [:create, :show]
+  resources :follow_relationships, only: [:create, :show, :destroy]
 end
