@@ -1,6 +1,22 @@
 class User < ApplicationRecord
   has_many :sleep_records, dependent: :destroy
 
+  # Relationships where the user is the followee
+  has_many :followee_relationships,
+    class_name: "FollowRelationship",
+    foreign_key: "followee_id",
+    inverse_of: :followee,
+    dependent: :destroy
+
+  has_many :followers, through: :followee_relationships, class_name: "User", foreign_key: "follower_id"
+
+  # Relationships where the user is the follower
+  has_many :follower_relationships,
+    class_name: "FollowRelationship",
+    foreign_key: "follower_id",
+    inverse_of: :follower,
+    dependent: :destroy
+
   validates :name, presence: true, uniqueness: true
 
   def friends
@@ -10,18 +26,6 @@ class User < ApplicationRecord
   private
 
   def friend_relationships
-    FollowRelationship.where(
-      follower: self,
-      followee: followers
-    )
-  end
-
-  def followers
-    User.where(id: followee_relationships.pluck(:follower_id))
-  end
-
-  # Relationships where the user is the followee
-  def followee_relationships
-    FollowRelationship.where(followee: self)
+    follower_relationships.where(followee: followers)
   end
 end
