@@ -51,6 +51,36 @@ RSpec.describe SleepRecord, type: :model do
     end
   end
 
+  describe "#save" do
+    let(:clocked_in_at) { Time.utc(2023, 1, 1) }
+
+    context "when completed" do
+      let(:duration) { 8.hours }
+
+      let(:sleep_record) do
+        build(:sleep_record, clocked_in_at: clocked_in_at, clocked_out_at: clocked_in_at + duration)
+      end
+
+      it "sets the duration of the sleep record" do
+        sleep_record.save!
+
+        expect(sleep_record.duration).to eq(duration)
+      end
+    end
+
+    context "when ongoing" do
+      let(:sleep_record) do
+        build(:sleep_record, clocked_in_at: clocked_in_at, clocked_out_at: nil)
+      end
+
+      it "does not set the duration of the sleep record" do
+        sleep_record.save!
+
+        expect(sleep_record.duration).to be_nil
+      end
+    end
+  end
+
   describe ".ongoing" do
     subject(:ongoing_sleep_records) { described_class.ongoing }
 
@@ -121,6 +151,46 @@ RSpec.describe SleepRecord, type: :model do
         expect(sleep_record.errors[:base]).to include("has already been clocked out")
         expect(sleep_record.clocked_out_at).to eq(clocked_out_at)
       end
+    end
+  end
+
+  describe ".completed" do
+    let(:status) { :some_sleep_record_status }
+
+    let!(:sleep_record) { create(:sleep_record, status) }
+
+    context "when a sleep record is completed" do
+      let(:status) { :completed }
+
+      it "includes the sleep record" do
+        expect(described_class.completed).to include(sleep_record)
+      end
+    end
+
+    context "when a sleep record is ongoing" do
+      let(:status) { :ongoing }
+
+      it "excludes the sleep record" do
+        expect(described_class.completed).not_to include(sleep_record)
+      end
+    end
+  end
+
+  describe "#completed?" do
+    subject(:is_completed) { sleep_record.completed? }
+
+    let!(:sleep_record) { build(:sleep_record, clocked_out_at: clocked_out_at) }
+
+    context "when the clocked_out_at is present" do
+      let(:clocked_out_at) { Time.utc(2023, 1, 1) }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context "when the clocked_out_at is nil" do
+      let(:clocked_out_at) { nil }
+
+      it { is_expected.to be_falsey }
     end
   end
 end

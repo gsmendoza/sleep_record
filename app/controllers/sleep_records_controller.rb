@@ -1,8 +1,21 @@
 class SleepRecordsController < ApplicationController
   before_action :set_sleep_record, only: %i[show clock_out]
+  before_action :set_user, only: %i[friend]
 
   def index
     @sleep_records = SleepRecord.order(:created_at).page(params[:page]).per(params[:per])
+
+    render json: @sleep_records
+  end
+
+  # Sleep records of user's friends
+  def friend
+    @sleep_records =
+      SleepRecord.completed
+        .where(user: @user.friends)
+        .order(:duration)
+        .page(params[:page])
+        .per(params[:per])
 
     render json: @sleep_records
   end
@@ -33,6 +46,10 @@ class SleepRecordsController < ApplicationController
 
   def set_sleep_record
     @sleep_record = SleepRecord.find(params[:id])
+  end
+
+  def set_user
+    @user = User.find(params[:user_id])
   end
 
   def sleep_record_params

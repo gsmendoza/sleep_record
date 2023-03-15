@@ -26,6 +26,114 @@ RSpec.describe "/sleep_records", type: :request do
     end
   end
 
+  describe "GET /friend" do
+    def get_sleep_records_of_friends
+      get friend_sleep_records_url(user_id: user.id), headers: valid_headers, as: :json
+
+      ActiveSupport::JSON.decode(response.body)
+    end
+
+    let!(:user) { create(:user) }
+
+    it "renders a successful response" do
+      get_sleep_records_of_friends
+
+      expect(response).to be_successful
+    end
+
+    context "when the user doesn't have friends" do
+      before do
+        expect(FollowRelationship.count).to eq(0)
+      end
+
+      it "returns an empty set" do
+        sleep_record_hashes = get_sleep_records_of_friends
+
+        expect(sleep_record_hashes.size).to eq(0)
+      end
+    end
+
+    context "when the user's friends do not have sleep records" do
+      let!(:friend) { create(:user, :friend, friend: user) }
+
+      before do
+        expect(SleepRecord.count).to eq(0)
+      end
+
+      it "returns an empty set" do
+        sleep_record_hashes = get_sleep_records_of_friends
+
+        expect(sleep_record_hashes.size).to eq(0)
+      end
+    end
+
+    context "when the user has a friend with an ongoing sleep record" do
+      let!(:friend) { create(:user, :friend, friend: user) }
+      let!(:sleep_record) { create(:sleep_record, :ongoing, user: friend) }
+
+      it "returns an empty set" do
+        sleep_record_hashes = get_sleep_records_of_friends
+
+        expect(sleep_record_hashes.size).to eq(0)
+      end
+    end
+
+    context "when the user has a friend with a completed sleep record" do
+      let!(:friend) { create(:user, :friend, friend: user) }
+      let!(:sleep_record) { create(:sleep_record, :completed, user: friend) }
+
+      it "includes the sleep record of the friend", :aggregate_failures do
+        sleep_record_hashes = get_sleep_records_of_friends
+
+        expect(sleep_record_hashes.size).to eq(1)
+        expect(sleep_record_hashes[0]["id"]).to eq(sleep_record.id)
+      end
+    end
+
+    context "when the user has a friend with multiple sleep records" do
+      let!(:friend) { create(:user, :friend, friend: user) }
+
+      let!(:sleep_records) do
+        [
+          create(:sleep_record, :completed, :with_duration, user: friend, specified_duration: 9.hours),
+          create(:sleep_record, :completed, :with_duration, user: friend, specified_duration: 8.hours)
+        ]
+      end
+
+      it "includes the completed sleep records of the user's friend, ordered by duration", :aggregate_failures do
+        sleep_record_hashes = get_sleep_records_of_friends
+
+        expect(sleep_record_hashes.size).to eq(2)
+        expect(sleep_record_hashes[0]["id"]).to eq(sleep_records[1].id)
+        expect(sleep_record_hashes[0]["duration"]).to eq(8.hours)
+      end
+    end
+
+    context "when the user has friends with sleep records" do
+      let!(:friends) do
+        [
+          create(:user, :friend, friend: user),
+          create(:user, :friend, friend: user)
+        ]
+      end
+
+      let!(:sleep_records) do
+        [
+          create(:sleep_record, :completed, :with_duration, user: friends[1], specified_duration: 9.hours),
+          create(:sleep_record, :completed, :with_duration, user: friends[0], specified_duration: 8.hours)
+        ]
+      end
+
+      it "includes the completed sleep records of the user's friends, ordered by duration", :aggregate_failures do
+        sleep_record_hashes = get_sleep_records_of_friends
+
+        expect(sleep_record_hashes.size).to eq(2)
+        expect(sleep_record_hashes[0]["id"]).to eq(sleep_records[1].id)
+        expect(sleep_record_hashes[0]["duration"]).to eq(8.hours)
+      end
+    end
+  end
+
   describe "GET /show" do
     let!(:sleep_record) { create(:sleep_record) }
 
