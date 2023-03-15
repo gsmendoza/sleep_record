@@ -26,5 +26,10 @@ FactoryBot.define do
       clocked_in_at { Time.utc(2023, 1, 1, 22) }
       clocked_out_at { clocked_in_at + specified_duration.seconds }
     end
+
+    trait :with_specific_clocked_out_at do
+      clocked_in_at { clocked_out_at - 8.hours }
+      clocked_out_at { clocked_out_at }
+    end
   end
 end

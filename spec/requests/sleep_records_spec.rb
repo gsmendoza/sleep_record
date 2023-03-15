@@ -78,9 +78,32 @@ RSpec.describe "/sleep_records", type: :request do
       end
     end
 
-    context "when the user has a friend with a completed sleep record" do
+    context "when the user has a friend with a completed sleep record clocked out more than one week ago" do
       let!(:friend) { create(:user, :friend, friend: user) }
-      let!(:sleep_record) { create(:sleep_record, :completed, user: friend) }
+
+      let!(:sleep_record) do
+        create(:sleep_record,
+          :with_specific_clocked_out_at,
+          user: friend,
+          clocked_out_at: 8.days.ago)
+      end
+
+      it "returns an empty set" do
+        sleep_record_hashes = get_sleep_records_of_friends
+
+        expect(sleep_record_hashes.size).to eq(0)
+      end
+    end
+
+    context "when the user has a friend with a completed sleep record clocked out at least one week ago" do
+      let!(:friend) { create(:user, :friend, friend: user) }
+
+      let!(:sleep_record) do
+        create(:sleep_record,
+          :with_specific_clocked_out_at,
+          user: friend,
+          clocked_out_at: 6.days.ago)
+      end
 
       it "includes the sleep record of the friend", :aggregate_failures do
         sleep_record_hashes = get_sleep_records_of_friends
@@ -90,13 +113,13 @@ RSpec.describe "/sleep_records", type: :request do
       end
     end
 
-    context "when the user has a friend with multiple sleep records" do
+    context "when the user has a friend with multiple sleep records at least one week ago" do
       let!(:friend) { create(:user, :friend, friend: user) }
 
       let!(:sleep_records) do
         [
-          create(:sleep_record, :completed, :with_duration, user: friend, specified_duration: 9.hours),
-          create(:sleep_record, :completed, :with_duration, user: friend, specified_duration: 8.hours)
+          create(:sleep_record, :with_duration, user: friend, clocked_in_at: 6.days.ago, specified_duration: 9.hours),
+          create(:sleep_record, :with_duration, user: friend, clocked_in_at: 6.days.ago, specified_duration: 8.hours)
         ]
       end
 
@@ -119,8 +142,8 @@ RSpec.describe "/sleep_records", type: :request do
 
       let!(:sleep_records) do
         [
-          create(:sleep_record, :completed, :with_duration, user: friends[1], specified_duration: 9.hours),
-          create(:sleep_record, :completed, :with_duration, user: friends[0], specified_duration: 8.hours)
+          create(:sleep_record, :with_duration, user: friends[1], clocked_in_at: 6.days.ago, specified_duration: 9.hours),
+          create(:sleep_record, :with_duration, user: friends[0], clocked_in_at: 6.days.ago, specified_duration: 8.hours)
         ]
       end
 

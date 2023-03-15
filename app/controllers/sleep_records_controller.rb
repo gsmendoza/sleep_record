@@ -13,6 +13,7 @@ class SleepRecordsController < ApplicationController
     @sleep_records =
       SleepRecord.completed
         .where(user: @user.friends)
+        .where("clocked_out_at >= :clocked_out_at", clocked_out_at: 1.week.ago)
         .order(:duration)
         .page(params[:page])
         .per(params[:per])
